@@ -1,5 +1,6 @@
 const { response, request } = require('express')
 const express = require('express')
+const req = require('express/lib/request')
 const app = express()
 
 app.use(express.json())
@@ -59,6 +60,36 @@ app.delete('/api/persons/:id', (request, response) => {
   persons = persons.filter(p => p.id !== id)
 
   response.status(204).end()
+})
+
+app.post('/api/persons', (request, response) => {
+  const body = request.body
+
+  if(!body.name) {
+    return response.status(400).json({
+      error: 'name is missing'
+    })
+  } else if (!body.number) {
+    return response.status(400).json({
+      error: 'number is missing'
+    })    
+  } else if (persons.find(p => p.name === body.name)) {
+    return response.status(400).json({
+      error: 'name must be unique'
+    })      
+  } else {
+    const person = {
+      name: body.name,
+      number: body.number,
+      id: Math.floor(Math.random()*10000)
+    }
+
+    console.log(person)
+    persons = persons.concat(person)
+    
+    response.json(person)
+
+  }
 })
 
 const PORT = 3001
