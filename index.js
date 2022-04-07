@@ -5,9 +5,9 @@ require('dotenv').config()
 const morgan = require('morgan')
 const Person = require('./models/person')
 
-morgan.token('body', function (req, res) {
-  if (req.method === 'POST') {
-    return JSON.stringify(req.body)
+morgan.token('body', function (request, response) {
+  if (request.method === 'POST') {
+    return JSON.stringify(request.body)
   }
 })
 
