@@ -29,27 +29,19 @@ app.get('/info', (request, response) => {
   })
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
-  if(!body.name === undefined) {
-    return response.status(400).json({
-      error: 'name is missing'
-    })
-  } else if (!body.number) {
-    return response.status(400).json({
-      error: 'number is missing'
-    })        
-  } else { 
-    const person = new Person({
-      name: body.name,
-      number: body.number,
-    })
-    person.save().then(savedPerson => {
-      response.json(savedPerson)
-      console.log('Person added')
-    })
-  }
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  })
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+    console.log('Person added')
+  })
+  .catch(error => next(error))
+  
 })
 
 app.get('/api/persons', (request, response) => {
@@ -106,6 +98,8 @@ const errorHandler = (error, request, response, next) => {
   console.error(error.message)
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).send( { error: error.message})
   }
   next(error)
 }
