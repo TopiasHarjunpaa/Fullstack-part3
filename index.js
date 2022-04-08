@@ -77,11 +77,6 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.put('/api/persons/:id', (request, response, next) => {
   const { name, number } = request.body
 
-  const person = {
-    name: body.name,
-    number: body.number,
-  }
-
   Person.findByIdAndUpdate(
     request.params.id,
     { name, number }, 
