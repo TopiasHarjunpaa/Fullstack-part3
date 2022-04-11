@@ -5,7 +5,7 @@ require('dotenv').config()
 const morgan = require('morgan')
 const Person = require('./models/person')
 
-morgan.token('body', function (request, response) {
+morgan.token('body', function (request) {
   if (request.method === 'POST') {
     return JSON.stringify(request.body)
   }
@@ -40,8 +40,7 @@ app.post('/api/persons', (request, response, next) => {
     response.json(savedPerson)
     console.log('Person added')
   })
-  .catch(error => next(error))
-  
+    .catch(error => next(error))
 })
 
 app.get('/api/persons', (request, response) => {
@@ -52,7 +51,6 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
-  const id = Number(request.params.id)
   Person.findById(request.params.id)
     .then(person => {
       if (person) {
@@ -60,7 +58,7 @@ app.get('/api/persons/:id', (request, response, next) => {
         response.json(person)
       } else {
         console.log('person not found')
-        response.status(404).end()        
+        response.status(404).end()
       }
     })
     .catch(error => next(error))
@@ -70,6 +68,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
     .then(result => {
       response.status(204).end()
+      console.log(result)
     })
     .catch(error => next(error))
 })
@@ -79,7 +78,7 @@ app.put('/api/persons/:id', (request, response, next) => {
 
   Person.findByIdAndUpdate(
     request.params.id,
-    { name, number }, 
+    { name, number },
     { new: true, runValidators: true, context: 'query' })
     .then(updatedPerson => {
       response.json(updatedPerson)
@@ -97,7 +96,7 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
-    return response.status(400).send( { error: error.message})
+    return response.status(400).send( { error: error.message })
   }
   next(error)
 }
